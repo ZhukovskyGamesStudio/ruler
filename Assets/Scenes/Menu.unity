@@ -4501,7 +4501,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &354350955
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5281,11 +5281,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1904257068}
+  m_Father: {fileID: 2064500720}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 60, y: 162}
+  m_AnchoredPosition: {x: -104, y: -1}
   m_SizeDelta: {x: 103, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &419698235
@@ -6556,7 +6556,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 0.75
-  m_Text: PolishGames  Ver 0.93 beta
+  m_Text: PolishGames  Ver 1.2
 --- !u!222 &531258002
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11464,7 +11464,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -77, y: -120}
+  m_AnchoredPosition: {x: 0, y: -120}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &891979811
@@ -11667,7 +11667,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &904240941
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15925,7 +15925,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1307521868
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17431,7 +17431,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1378258856
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21131,7 +21131,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1749063075
 RectTransform:
   m_ObjectHideFlags: 0
@@ -23017,7 +23017,6 @@ RectTransform:
   - {fileID: 1347456925}
   - {fileID: 2037599151}
   - {fileID: 1392257433}
-  - {fileID: 419698234}
   - {fileID: 1532713970}
   - {fileID: 2064500720}
   - {fileID: 523525206}
@@ -25071,7 +25070,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2064500720
 RectTransform:
   m_ObjectHideFlags: 0
@@ -25085,6 +25084,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 726446616}
+  - {fileID: 419698234}
   m_Father: {fileID: 1904257068}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -28369,7 +28369,7 @@ MonoBehaviour:
   DF: {fileID: 8811876582405389913}
   BuckCollected: {fileID: 538980695}
   DeckDone: {fileID: 2030192770}
-  time: 60
+  time: 120
   addtime: 0
   buckChance: 0
   curDeck: {fileID: 0}
@@ -28377,7 +28377,6 @@ MonoBehaviour:
   correctCnt: 0
   scoreCnt: 0
   solvedDecksCnt: 0
-  bucksCnt: 0
   bucksSaved: 0
   timeSpent: 0
   seconds: 0

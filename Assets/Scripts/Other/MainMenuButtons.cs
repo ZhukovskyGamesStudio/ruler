@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using GooglePlayGames;
-using GoogleMobileAds.Api;
 
 // 
 /// <summary>
@@ -29,8 +27,8 @@ public class MainMenuButtons : MonoBehaviour {
     private const string bucks10_ad = "ca-app-pub-5529160665131462/8199013869";
     private const string doubleBucks_ad = "ca-app-pub-5529160665131462/6367945492";
 
-    private RewardedAd ad;
-    private RewardedAd ad1;
+    //private RewardedAd ad;
+    //private RewardedAd ad1;
 
     private const string gameOver_ad = "ca-app-pub-5529160665131462/5078026508";
 
@@ -64,9 +62,9 @@ public class MainMenuButtons : MonoBehaviour {
         curCanvas = 0;
 
         ActivateGooglePlay();
-        MobileAds.Initialize(initStatus => { });
-        LoadAd();
-        LoadAd1();
+        //MobileAds.Initialize(initStatus => { });
+        //LoadAd();
+        //LoadAd1();
 
         if (!PlayerPrefs.HasKey("tutorialComplete")) {
             To(9);
@@ -154,12 +152,12 @@ public class MainMenuButtons : MonoBehaviour {
     }
 
     /**********/
-    private void LoadAd() {
+   /* private void LoadAd() {
         ad = new RewardedAd(bucks10_ad);
 
         AdRequest request = new AdRequest.Builder()
-            /*.AddTestDevice(AdRequest.TestDeviceSimulator)
-            .AddTestDevice("A118218DAE8D3296")*/
+            .AddTestDevice(AdRequest.TestDeviceSimulator)
+            .AddTestDevice("A118218DAE8D3296")
             .Build();
 
         ad.LoadAd(request);
@@ -169,13 +167,14 @@ public class MainMenuButtons : MonoBehaviour {
         ad1 = new RewardedAd(doubleBucks_ad);
 
         AdRequest request = new AdRequest.Builder()
-            /*.AddTestDevice(AdRequest.TestDeviceSimulator)
-            .AddTestDevice("A118218DAE8D3296")*/
+            .AddTestDevice(AdRequest.TestDeviceSimulator)
+            .AddTestDevice("A118218DAE8D3296")
             .Build();
 
         ad1.LoadAd(request);
-    }
+    }*/
 
+    /*
     public void WatchAd() {
         if (ad.IsLoaded()) {
             ad.Show();
@@ -190,7 +189,7 @@ public class MainMenuButtons : MonoBehaviour {
             ad1.OnUserEarnedReward += GM.OnUserDoubledReward;
             LoadAd1();
         }
-    }
+    }*/
 
     public void OnUserEarnedReward(object sender, System.EventArgs args) {
         int bucks = PlayerPrefs.GetInt("bucks");
@@ -208,9 +207,13 @@ public class MainMenuButtons : MonoBehaviour {
 
     public void ActivateGooglePlay() {
         if (!isActive) {
+            
+            /*
 #if UNITY_ANDROID
             PlayGamesPlatform.Activate();
 #endif
+
+*/
 
             Social.localUser.Authenticate((bool sucess) => { isActive = sucess; });
         }

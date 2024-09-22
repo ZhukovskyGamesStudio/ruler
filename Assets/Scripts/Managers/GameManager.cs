@@ -57,9 +57,6 @@ public class GameManager : MonoBehaviour {
     public int solvedDecksCnt;
 
     [HideInInspector]
-    public int bucksCnt;
-
-    [HideInInspector]
     public int bucksSaved;
 
     [HideInInspector]
@@ -109,7 +106,9 @@ public class GameManager : MonoBehaviour {
 
     public void СollectedBuck(int value) {
         BuckCollected.Play();
-        bucksCnt += value;
+       
+        bucksSaved += value;
+        
         StartCoroutine(QuoteShow(2));
     }
 
@@ -133,8 +132,6 @@ public class GameManager : MonoBehaviour {
     }
 
     public void FinishSequence() {
-        bucksSaved += bucksCnt;
-        bucksCnt = 0;
 
         int rulesDone;
         if (PlayerPrefs.HasKey("rulesDone"))
@@ -199,7 +196,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void DoubleBucks() {
-        MMB.WatchDoubleAd();
+       // MMB.WatchDoubleAd();
     }
 
     public void OnUserDoubledReward(object sender, System.EventArgs args) {
@@ -231,7 +228,6 @@ public class GameManager : MonoBehaviour {
         CorrectCounter(false);
         DF.Clear();
         previousPams = null;
-        bucksCnt = 0;
     }
 
     public void Reload() {
@@ -263,12 +259,12 @@ public class GameManager : MonoBehaviour {
             }
 
             MainCards[i] = Instantiate(curDeck.Cards[Random.Range(0, curDeck.Cards.Length)], HandPos[i]);
-            if (!zenBl) {
+            //if (!zenBl) {
                 if (Random.Range(0, 100) <= buckChance) {
                     Instantiate(BuckPrefab, MainCards[i].transform);
                     MainCards[i].GetComponent<CardScript>().withBuck = true;
                 }
-            }
+            //}
         }
     }
 
@@ -374,7 +370,7 @@ public class GameManager : MonoBehaviour {
             case 2:
                 switch (Random.Range(0, 7)) {
                     case 0:
-                        quoteText.text = bucksCnt.ToString() + "® in my pockets, " + bucksCnt.ToString() + "®...";
+                        quoteText.text = bucksSaved.ToString() + "® in my pockets, " + bucksSaved.ToString() + "®...";
                         break;
                     case 1:
                         quoteText.text = "Cash cash ca-a-ash!!";
@@ -383,10 +379,10 @@ public class GameManager : MonoBehaviour {
                         quoteText.text = "Can I invest them? ";
                         break;
                     case 3:
-                        quoteText.text = bucksCnt.ToString() + "® — nothing is better than a fresh bill.";
+                        quoteText.text = bucksSaved.ToString() + "® — nothing is better than a fresh bill.";
                         break;
                     case 4:
-                        quoteText.text = bucksCnt.ToString() + "® — already ®illionare.";
+                        quoteText.text = bucksSaved.ToString() + "® — already ®illionare.";
                         break;
                     case 5:
                         quoteText.text = "® -> ®® -> ®®®®!";
