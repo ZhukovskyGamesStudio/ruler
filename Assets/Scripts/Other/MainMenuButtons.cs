@@ -200,9 +200,9 @@ public class MainMenuButtons : MonoBehaviour {
     /**********/
 
     public void SendRecord(int score) {
-        Social.ReportScore(score, leaderBoard, (bool sucess) => {
+/*        Social.ReportScore(score, leaderBoard, (bool sucess) => {
             if (sucess) { } else { }
-        });
+        });*/
     }
 
     public void ActivateGooglePlay() {
@@ -215,16 +215,16 @@ public class MainMenuButtons : MonoBehaviour {
 
 */
 
-            Social.localUser.Authenticate((bool sucess) => { isActive = sucess; });
+            //Social.localUser.Authenticate((bool sucess) => { isActive = sucess; });
         }
     }
 
     public void ShowGlobalRecords() {
-        Social.ShowLeaderboardUI();
+        //Social.ShowLeaderboardUI();
     }
 
     public void ShowAchievementList() {
-        Social.ShowAchievementsUI();
+        //Social.ShowAchievementsUI();
     }
 
     /**********/
