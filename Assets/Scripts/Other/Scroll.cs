@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,7 +24,7 @@ public class Scroll : MonoBehaviour {
         wrongCards.position = new Vector3(correctCards.position.x, wrongCards.position.y, wrongCards.position.z);
     }
 
-    public IEnumerator GentleRevert() {
+    private IEnumerator GentleRevert() {
         float was = ScrollRectObj.horizontalNormalizedPosition;
         float time = 0;
         float MaxTime = 0.2f;

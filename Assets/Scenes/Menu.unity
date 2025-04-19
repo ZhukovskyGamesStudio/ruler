@@ -42,7 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -2873,7 +2874,6 @@ MonoBehaviour:
   BuySound: {fileID: 270800044}
   Towel: {fileID: 918719548}
   BuyButton: {fileID: 209748925}
-  DM: {fileID: 1904257069}
 --- !u!1 &244608893
 GameObject:
   m_ObjectHideFlags: 0
@@ -6139,8 +6139,9 @@ MonoBehaviour:
   - {fileID: 1436931009}
   quoteText: {fileID: 957772133}
   quoterText: {fileID: 394184898}
-  GM: {fileID: 8811876582405389912}
-  DM: {fileID: 1904257069}
+  _decksManager: {fileID: 1904257069}
+  _audioManager: {fileID: 1011527960}
+  _coreManager: {fileID: 8811876582405389912}
 --- !u!1 &520987969
 GameObject:
   m_ObjectHideFlags: 0
@@ -12818,7 +12819,7 @@ LightingSettings:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Settings.lighting
-  serializedVersion: 8
+  serializedVersion: 9
   m_EnableBakedLightmaps: 0
   m_EnableRealtimeLightmaps: 0
   m_RealtimeEnvironmentLighting: 1
@@ -23078,22 +23079,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   X: {fileID: 2087400551892138979, guid: 3111140823323f04493f86a3a24a3368, type: 3}
-  Dollar: {fileID: 4354210861107879107, guid: 0d8b4ecf826307248a5b5d036a4e57ce, type: 3}
+  _dollarButtonPrefab: {fileID: 4827227406393739709, guid: 0d8b4ecf826307248a5b5d036a4e57ce,
+    type: 3}
   ScoreText: {fileID: 672718980}
   CashText: {fileID: 169421049}
   WalletText: {fileID: 1347456926}
   CardsHandler: {fileID: 1553320594}
   toggle: {fileID: 1532713971}
   SwitchSound: {fileID: 865304407}
-  Decks:
-  - {fileID: -2226046826961584230, guid: c928b74b45619694eb45969e7b7f8ee4, type: 3}
-  - {fileID: 985519211908239850, guid: 2f4aa79e088e60f45b41e0cac34b8a8e, type: 3}
-  - {fileID: 3469742924122285075, guid: 6acc9a5b2b4a29146b636bf2caccfd3a, type: 3}
-  - {fileID: 7660663602032388244, guid: 07a280d35265f1246805ab36e9065dee, type: 3}
-  - {fileID: -2136724587934184608, guid: 749f53c7ed3279d4ea9ab0889c72bbea, type: 3}
-  - {fileID: 1357225710723777245, guid: 86426d8fb51038d48927c269598e39b4, type: 3}
+  DecksTableConfig: {fileID: 11400000, guid: 1b1dae249fc7ac24a982820237de2b50, type: 2}
   decksOnAmount: 0
-  bucksCnt: 0
   scoreCnt: 0
   cashCnt: 0
 --- !u!1 &1916977888
@@ -25450,14 +25445,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d039b858cb150240a85a4fbab483b8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  curDeck: {fileID: -5204712306460464777, guid: fe1cd5a400cde144cba93ca903702176,
-    type: 3}
+  <TutorialDeck>k__BackingField: {fileID: 11400000, guid: e2c81aae2b57b9f498de4fa5cb2cc65f,
+    type: 2}
   HandPos:
   - {fileID: 1352681536}
   - {fileID: 1711093738}
   - {fileID: 1780815404}
   - {fileID: 1628778586}
-  MMB: {fileID: 519420033}
   StashButton: {fileID: 649433420}
   ProgressHandler: {fileID: 1936348576}
   progress:
@@ -28400,20 +28394,17 @@ MonoBehaviour:
   - {fileID: 1177148292}
   - {fileID: 1516366360}
   - {fileID: 678266257}
-  MMB: {fileID: 519420033}
-  DM: {fileID: 1904257069}
   DF: {fileID: 8811876582405389913}
   BuckCollected: {fileID: 538980695}
   DeckDone: {fileID: 2030192770}
   time: 120
   addtime: 0
   buckChance: 0
-  curDeck: {fileID: 0}
   MainCards: []
   correctCnt: 0
   scoreCnt: 0
   solvedDecksCnt: 0
-  bucksSaved: 0
+  bucksEarned: 0
   timeSpent: 0
   seconds: 0
   zenBl: 0

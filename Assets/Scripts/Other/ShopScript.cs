@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class ShopScript : MonoBehaviour {
     public Text nameText;
@@ -15,41 +15,45 @@ public class ShopScript : MonoBehaviour {
 
     public GameObject Towel;
     public GameObject BuyButton;
-
-    public DecksManager DM;
+    
     private int cost;
-    private DeckScript deck;
-    private int deckIndex;
+    private DeckConfig _deck;
+    private int _selectedDeckIndex;
 
-    public void MakeVitrina(DeckScript tmpDeck, int tmpdeckIndex) {
+    public static ShopScript Instance;
+
+    private void Awake() {
+        Instance = this;
+    }
+
+    public void OpenBuyOffer(DeckConfig tmpDeck) {
         BuyButton.SetActive(true);
         ShowTowel(false);
-        deck = tmpDeck;
-        deckIndex = tmpdeckIndex;
-        nameText.text = deck.name;
-        scoreText.text = "x" + deck.scoreGet.ToString();
-        cashText.text = "x" + deck.cashGet.ToString();
-        cost = deck.cost;
+        _deck = tmpDeck;
+        nameText.text = _deck.name;
+        scoreText.text = "x" + _deck.scoreGet.ToString();
+        cashText.text = "x" + _deck.cashGet.ToString();
+        cost = _deck.cost;
         costText.text = cost.ToString() + "®";
 
-        for (int i = 0; i < places.Length; i++) {
-            foreach (Transform child in places[i].transform) {
+        foreach (Transform t in places) {
+            foreach (Transform child in t.transform) {
                 Destroy(child.gameObject);
             }
 
-            GameObject a = Instantiate(deck.Cards[Random.Range(0, deck.Cards.Length)], places[i]);
+            GameObject a = Instantiate(_deck.Cards[Random.Range(0, _deck.Cards.Length)], t);
             a.GetComponent<Image>().raycastTarget = false;
         }
     }
 
     public void Buy() {
-        if (DM.bucksCnt >= cost) {
+        if (SaveManager.SaveData.bucks >= cost) {
             BuyButton.SetActive(false);
-            DM.Decks[deckIndex].isBought = true;
-            DM.bucksCnt -= cost;
+            DecksManager.Instance.BuyDeck(_deck.DeckType);
+            SaveManager.SaveData.bucks -= cost;
             BuySound.Play();
-            DM.ReSaveDecks();
-            DM.Recast();
+            SaveManager.Save();
+            DecksManager.Instance.Recast();
         } else {
             ShowTowel(true);
         }

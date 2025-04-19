@@ -1,28 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Xscript : MonoBehaviour {
-    public int deckIndex;
+    public DeckType DeckType;
     public Text Xtext;
     public Image CardImg;
-    DecksManager DM;
-
-    private void Start() {
-        DM = GameObject.Find("DecksCanvas").GetComponent<DecksManager>();
-    }
 
     public void DisEnable() {
-        bool isEnabled = !DM.Decks[deckIndex].IsEnb;
-
-        if ((DM.decksOnAmount > 2 && !isEnabled) || isEnabled) {
-            DM.SwitchDeckSound();
-            DM.Decks[deckIndex].IsEnb = isEnabled;
-            Change(isEnabled);
-            DM.ReCount();
-            DM.ReSaveDecks();
-        }
+        bool res = DecksManager.Instance.TryToggleDeck(DeckType);
+        Change(res);
     }
 
     public void Change(bool isEnabled) {

@@ -18,8 +18,14 @@ public class MainMenuButtons : MonoBehaviour {
     public Text quoteText;
     public Text quoterText;
 
-    public GameManager GM;
-    public DecksManager DM;
+    [SerializeField]
+    private DecksManager _decksManager;
+
+    [SerializeField]
+    private AudioManager _audioManager;
+
+    [SerializeField]
+    private CoreManager _coreManager;
 
     private const string leaderBoard = "CgkIzqeEhsMMEAIQAw";
 
@@ -38,7 +44,19 @@ public class MainMenuButtons : MonoBehaviour {
     int curCanvas;
 
     bool isActive;
+
+    public static MainMenuButtons Instance;
     /**********/
+
+    public void Awake() {
+        Instance = this;
+    }
+
+    private void DisableCanvases() {
+        foreach (Transform t in Canvases) {
+            t.gameObject.SetActive(false);
+        }
+    }
 
     void Update() {
 #if UNITY_ANDROID
@@ -48,12 +66,8 @@ public class MainMenuButtons : MonoBehaviour {
 #endif
     }
 
-    public void Awake() {
-        for (int i = 0; i < Canvases.Length; i++)
-            Canvases[i].gameObject.SetActive(false);
-    }
-
     public void Start() {
+        DisableCanvases();
 #if UNITY_ANDROID
         QualitySettings.vSyncCount = 0;
 #endif
@@ -68,13 +82,9 @@ public class MainMenuButtons : MonoBehaviour {
 
         if (!PlayerPrefs.HasKey("tutorialComplete")) {
             To(9);
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().AmbientSwitch(-2);
-            SaveManager.CreateSave(DM);
+            _audioManager.AmbientSwitch(-2);
         } else
             To(0);
-
-        if (!PlayerPrefs.HasKey("bucks"))
-            SaveManager.CreateSave(DM);
 
         QuoteShow();
     }
@@ -95,8 +105,7 @@ public class MainMenuButtons : MonoBehaviour {
     /**********/
 
     public void ResetData() {
-        PlayerPrefs.DeleteAll();
-        SaveManager.CreateSave(DM);
+        SaveManager.ClearSave();
     }
 
     public void QuitGame() {
@@ -135,44 +144,45 @@ public class MainMenuButtons : MonoBehaviour {
     }
 
     public void UpdateRecords() {
-        Save sv = SaveManager.Load();
         for (int i = 0; i < Records.Length; i++) {
             Records[i].text = "Record";
             RecordsTime[i].text = "";
         }
 
-        int t;
-        for (int i = 0; i < sv.records.Length; i++) {
-            if (sv.records[i].score > 0) {
-                Records[i].text = sv.records[i].score.ToString();
-                t = sv.records[i].time;
-                RecordsTime[i].text = (t / 60 < 10 ? "0" : "") + t / 60 + " : " + (t % 60 < 10 ? "0" : "") + t % 60;
+        Record[] records = SaveManager.SaveData.records;
+        for (int i = 0; i < records.Length; i++) {
+            if (records[i].score <= 0) {
+                continue;
             }
+
+            Records[i].text = records[i].score.ToString();
+            int t = records[i].time;
+            RecordsTime[i].text = (t / 60 < 10 ? "0" : "") + t / 60 + " : " + (t % 60 < 10 ? "0" : "") + t % 60;
         }
     }
 
     /**********/
-   /* private void LoadAd() {
-        ad = new RewardedAd(bucks10_ad);
+    /* private void LoadAd() {
+         ad = new RewardedAd(bucks10_ad);
 
-        AdRequest request = new AdRequest.Builder()
-            .AddTestDevice(AdRequest.TestDeviceSimulator)
-            .AddTestDevice("A118218DAE8D3296")
-            .Build();
+         AdRequest request = new AdRequest.Builder()
+             .AddTestDevice(AdRequest.TestDeviceSimulator)
+             .AddTestDevice("A118218DAE8D3296")
+             .Build();
 
-        ad.LoadAd(request);
-    }
+         ad.LoadAd(request);
+     }
 
-    private void LoadAd1() {
-        ad1 = new RewardedAd(doubleBucks_ad);
+     private void LoadAd1() {
+         ad1 = new RewardedAd(doubleBucks_ad);
 
-        AdRequest request = new AdRequest.Builder()
-            .AddTestDevice(AdRequest.TestDeviceSimulator)
-            .AddTestDevice("A118218DAE8D3296")
-            .Build();
+         AdRequest request = new AdRequest.Builder()
+             .AddTestDevice(AdRequest.TestDeviceSimulator)
+             .AddTestDevice("A118218DAE8D3296")
+             .Build();
 
-        ad1.LoadAd(request);
-    }*/
+         ad1.LoadAd(request);
+     }*/
 
     /*
     public void WatchAd() {
@@ -207,7 +217,6 @@ public class MainMenuButtons : MonoBehaviour {
 
     public void ActivateGooglePlay() {
         if (!isActive) {
-            
             /*
 #if UNITY_ANDROID
             PlayGamesPlatform.Activate();
@@ -230,12 +239,12 @@ public class MainMenuButtons : MonoBehaviour {
     /**********/
 
 /*
-	private void OnApplicationQuit()
-	{
+    private void OnApplicationQuit()
+    {
 #if UNITY_ANDROID
-		PlayGamesPlatform.Instance. SignOut();
+        PlayGamesPlatform.Instance. SignOut();
 #endif
-	}*/
+    }*/
 
     /**********/
 
@@ -243,7 +252,7 @@ public class MainMenuButtons : MonoBehaviour {
         if (nextIndex == 4)
             UpdateRecords();
         if (nextIndex == 7) {
-            DM.ReLoadDecks();
+            DecksManager.Instance.ReLoadDecks();
         }
 
         if (nextIndex == 9)
@@ -269,7 +278,7 @@ public class MainMenuButtons : MonoBehaviour {
 
     public IEnumerator GameLateCreate(bool zen) {
         yield return new WaitForSeconds(0.15f);
-        GM.CreateLevel(zen);
+        _coreManager.CreateLevel(zen);
         yield return false;
     }
 }

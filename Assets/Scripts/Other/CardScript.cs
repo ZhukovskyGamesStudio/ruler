@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class CardScript : MonoBehaviour {
@@ -44,11 +42,11 @@ public class CardScript : MonoBehaviour {
         if (!areYouSpecial && (GameCanvas || TutorialCanvas)) {
             if (isTutorial) {
                 curCanvas = TutorialCanvas.transform;
-                Deck = TutorialCanvas.GetComponent<TutorialScript>().curDeck;
+                Deck = DeckRuleFactory.GetRuleByType(TutorialCanvas.GetComponent<TutorialScript>().TutorialDeck);
                 DF = TutorialCanvas.GetComponent<DropField>();
             } else {
                 curCanvas = GameCanvas.transform;
-                Deck = GameCanvas.GetComponent<GameManager>().curDeck;
+                Deck = GameCanvas.GetComponent<CoreManager>().curDeck;
                 DF = GameCanvas.GetComponent<DropField>();
             }
 
@@ -64,7 +62,7 @@ public class CardScript : MonoBehaviour {
         if (isTutorial)
             return Deck.CheckRule(Pams, TutorialScript.previousPams, isStepping);
         else
-            return Deck.CheckRule(Pams, GameManager.previousPams, isStepping);
+            return Deck.CheckRule(Pams, CoreManager.previousPams, isStepping);
     }
 
     public void OnClick() {
@@ -97,7 +95,7 @@ public class CardScript : MonoBehaviour {
                 if (!temp)
                     CanBeClicked = true;
                 if (withBuck) {
-                    GameCanvas.GetComponent<GameManager>().СollectedBuck(1);
+                    GameCanvas.GetComponent<CoreManager>().СollectedBuck(1);
 
                     if (transform.childCount > 1)
                         Destroy(transform.GetChild(1).gameObject);

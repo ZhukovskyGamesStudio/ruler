@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿public class ABCs : DeckScript {
+    public ABCs(DeckConfig config) : base(config) { }
 
-public class ABCs : DeckScript {
     public override bool CheckRule(int[] Pams, int[] PreviousPams, bool isStepping = false, int seed = 0) {
         bool ret = false;
 

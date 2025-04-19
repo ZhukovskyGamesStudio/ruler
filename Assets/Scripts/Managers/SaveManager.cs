@@ -1,92 +1,64 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public static class SaveManager {
-    public static void Save(bool isErasing, Save toSave) {
-        if (isErasing) {
-            PlayerPrefs.DeleteAll();
-            PlayerPrefs.SetInt("tutorialComplete", 1);
-        } else {
-            PlayerPrefs.SetInt("bucks", toSave.bucks);
-            PlayerPrefs.SetInt("decksAmount", toSave.deckDatas.Length);
+    public static Save SaveData;
 
-            for (int i = 0; i < toSave.deckDatas.Length; i++) {
-                PlayerPrefs.SetInt("isBought" + i.ToString(), toSave.deckDatas[i].isBought ? 1 : 0);
-                PlayerPrefs.SetInt("isEnabled" + i.ToString(), toSave.deckDatas[i].isEnabled ? 1 : 0);
-            }
+    private static DecksTableConfig _decksConfig;
 
-            PlayerPrefs.SetInt("recordsAmount", toSave.records.Length);
-            for (int i = 0; i < toSave.records.Length; i++) {
-                PlayerPrefs.SetInt("recordScore" + i.ToString(), toSave.records[i].score);
-                PlayerPrefs.SetInt("recordTime" + i.ToString(), toSave.records[i].time);
-            }
-
-            PlayerPrefs.SetFloat("effectsVolume", toSave.effectsVolume);
-            PlayerPrefs.SetFloat("musicVolume", toSave.musicVolume);
-        }
+    public static void Init(DecksTableConfig decksTableConfig) {
+        _decksConfig = decksTableConfig;
+        SaveData = Load(_decksConfig);
     }
 
-    public static Save Load() {
-        Save sv = new Save {
-            bucks = PlayerPrefs.GetInt("bucks"),
-            effectsVolume = PlayerPrefs.GetFloat("effectsVolume"),
-            musicVolume = PlayerPrefs.GetFloat("musicVolume")
-        };
-
-        int recordsAmount = PlayerPrefs.GetInt("recordsAmount");
-        if (recordsAmount > 0) {
-            sv.records = new Record[recordsAmount];
-            for (int i = 0; i < recordsAmount; i++)
-                sv.records[i] = new Record(PlayerPrefs.GetInt("recordScore" + i.ToString()), PlayerPrefs.GetInt("recordTime" + i.ToString()));
-        }
-
-        int deckAmount = PlayerPrefs.GetInt("decksAmount");
-        if (deckAmount > 0) {
-            sv.deckDatas = new DeckData[deckAmount];
-            for (int i = 0; i < deckAmount; i++)
-                sv.deckDatas[i] = new DeckData(PlayerPrefs.GetInt("isBought" + i.ToString()) == 1,
-                    PlayerPrefs.GetInt("isEnabled" + i.ToString()) == 1);
-        }
-
-        sv.effectsVolume = PlayerPrefs.GetFloat("effectsVolume");
-        sv.musicVolume = PlayerPrefs.GetFloat("musicVolume");
-        return sv;
+    public static void ClearSave() {
+        PlayerPrefs.DeleteAll();
+        SaveData = Load(_decksConfig);
     }
 
-    public static void CreateSave(DecksManager DM) {
+    public static void Save() {
+        PlayerPrefs.SetString("save", JsonUtility.ToJson(SaveData));
+    }
+
+    private static Save CreateNewSave(DecksTableConfig decksTableConfig) {
         Save sv = new Save {
             bucks = 0,
             effectsVolume = 0.5f,
-            musicVolume = 0.5f
+            musicVolume = 0.5f,
+            DeckDatas = new List<DeckData>()
         };
-
-        int amount = DM.Decks.Length;
-
-        sv.deckDatas = new DeckData[amount];
-        for (int i = 0; i < amount; i++)
-            if (i == 0 || i == 1)
-                sv.deckDatas[i] = new DeckData(true, true);
-            else
-                sv.deckDatas[i] = new DeckData(false, false);
-
+        foreach (DeckConfig deckConfig in decksTableConfig.Decks) {
+            sv.DeckDatas.Add(new DeckData(deckConfig.IsAlreadyAvailable, deckConfig.IsAlreadyAvailable));
+        }
         sv.records = new Record[3];
-        for (int i = 0; i < sv.records.Length; i++)
+        for (int i = 0; i < sv.records.Length; i++) {
             sv.records[i] = new Record(0, 0);
+        }
 
-        Save(false, sv);
-        Debug.Log("save created!");
+        return sv;
+    }
+
+    public static Save Load(DecksTableConfig decksTableConfig) {
+        if (!PlayerPrefs.HasKey("save")) {
+            return CreateNewSave(decksTableConfig);
+        }
+
+        string savedJson = PlayerPrefs.GetString("save");
+        return JsonUtility.FromJson<Save>(savedJson);
     }
 }
 
+[Serializable]
 public class Save {
     public int bucks;
     public Record[] records;
-    public DeckData[] deckDatas;
+    public List<DeckData> DeckDatas = new List<DeckData>();
     public float effectsVolume;
     public float musicVolume;
 }
 
+[Serializable]
 public class Record {
     public int score;
     public int time;
@@ -97,7 +69,9 @@ public class Record {
     }
 }
 
+[Serializable]
 public class DeckData {
+    public DeckType DeckType;
     public bool isBought;
     public bool isEnabled;
 

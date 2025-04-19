@@ -16,6 +16,6 @@ public static class AchievementsManager {
     public const string bornLucky_achieve = "CgkIzqeEhsMMEAIQDA";
 
     public static void GetTheAchivement(string id, float progress) {
-        Social.ReportProgress(id, progress, (bool sucess) => { });
+        //Social.ReportProgress(id, progress, (bool sucess) => { });
     }
 }

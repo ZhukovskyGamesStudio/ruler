@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -40,8 +38,8 @@ public class DropField : MonoBehaviour {
             LastPlace = Instantiate(PlacePrefab, WrongCards);
             EmptySpace.transform.SetAsLastSibling();
 
-            if (GetComponent<GameManager>())
-                GameManager.previousPams = card.GetComponent<CardScript>().Pams;
+            if (GetComponent<CoreManager>())
+                CoreManager.previousPams = card.GetComponent<CardScript>().Pams;
             else
                 TutorialScript.previousPams = card.GetComponent<CardScript>().Pams;
         } else {
@@ -53,8 +51,8 @@ public class DropField : MonoBehaviour {
         }
 
         card.localPosition = new Vector3(0, 0, 0);
-        if (GetComponent<GameManager>())
-            GetComponent<GameManager>().CorrectCounter(isItCorrect);
+        if (GetComponent<CoreManager>())
+            GetComponent<CoreManager>().CorrectCounter(isItCorrect);
         else
             GetComponent<TutorialScript>().CorrectCounter(isItCorrect);
         Scroll.GetComponent<Scroll>().Revert();

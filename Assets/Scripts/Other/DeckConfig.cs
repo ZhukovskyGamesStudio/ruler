@@ -1,23 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public abstract class DeckScript {
+[CreateAssetMenu(fileName = "DeckConfig", menuName = "Scriptable Objects/DeckConfig")]
+public class DeckConfig : ScriptableObject {
+    public DeckType DeckType;
     public int[] PamsVariety;
-    public List<GameObject> Cards;
+    public GameObject[] Cards;
 
-    protected DeckConfig _deckConfig;
+    [Space(20)]
+    public new string name;
+
+    public int cost;
+    public float scoreGet;
+    public float cashGet;
+    public bool IsAlreadyAvailable;
+
     /**********/
 
     protected int[] numbers;
     protected int step;
     protected int sequenceIndex;
-
-    public DeckScript(DeckConfig config) {
-        _deckConfig = config;
-        Cards = config.Cards.ToList();
-        PamsVariety = config.PamsVariety.ToArray();
-    }
 
     public void GenerateNumbers() {
         numbers = new int[10];
@@ -35,9 +38,21 @@ public abstract class DeckScript {
         step = 0;
     }
 
-    public abstract bool CheckRule(int[] Pams, int[] PreviousPams, bool isStepping = false, int seed = 0);
+    public bool CheckRule(int[] Pams, int[] PreviousPams, bool isStepping = false, int seed = 0) {
+        throw new NotImplementedException();
+    }
 
     protected void Log(string smth, bool showStep = false) {
         Debug.Log(smth + (showStep ? (", Step: " + step) : ""));
     }
+}
+[Serializable]
+public enum DeckType {
+    Tutorial,
+    Colours,
+    Dancers,
+    Flowers,
+    Stars,
+    ABCs,
+    Domino,
 }

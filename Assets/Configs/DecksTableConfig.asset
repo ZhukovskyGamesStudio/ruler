@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1018b50a5bc00a4bbaa2da8bc95107f, type: 3}
+  m_Name: DecksTableConfig
+  m_EditorClassIdentifier: 
+  Decks:
+  - {fileID: 11400000, guid: 2c3b94f9d980d3246b51987ba4ebcf77, type: 2}
+  - {fileID: 11400000, guid: a86700a5d66eded4799eaff12ce17146, type: 2}
+  - {fileID: 11400000, guid: e422c21366bc0064abbad084e5cf9dbe, type: 2}
+  - {fileID: 11400000, guid: 807fca636d8b0ce4f90b167cb6117ba0, type: 2}
+  - {fileID: 11400000, guid: 2b47610991ca1624591cbda15eb5d7bd, type: 2}
+  - {fileID: 11400000, guid: f343d6e6c50955c4c8b38bace9de9dd4, type: 2}

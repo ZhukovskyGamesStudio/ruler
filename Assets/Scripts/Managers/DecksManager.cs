@@ -1,12 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Random = UnityEngine.Random;
 
 public class DecksManager : MonoBehaviour {
     public GameObject X;
-    public GameObject Dollar;
+
+    [SerializeField]
+    private DollarScr _dollarButtonPrefab;
 
     public Text ScoreText;
     public Text CashText;
@@ -16,14 +19,11 @@ public class DecksManager : MonoBehaviour {
     public Toggle toggle;
     public AudioSource SwitchSound;
     public DeckScript[] Decks;
-
+    public DecksTableConfig DecksTableConfig;
     /**********/
 
     [HideInInspector]
     public int decksOnAmount;
-
-    [HideInInspector]
-    public int bucksCnt;
 
     [HideInInspector]
     public float scoreCnt;
@@ -31,47 +31,52 @@ public class DecksManager : MonoBehaviour {
     [HideInInspector]
     public float cashCnt;
 
-    private GameObject[] Cards;
-    Save sv;
+    private List<GameObject> _cards;
+
+    public static DecksManager Instance;
+
+    private void Awake() {
+        Instance = this;
+        SaveManager.Init(DecksTableConfig);
+    }
 
     private void Start() {
-        Cards = new GameObject[Decks.Length];
         ReLoadDecks();
     }
 
     public void Recast() {
-        foreach (Transform child in CardsHandler.transform)
+        foreach (Transform child in CardsHandler.transform) {
             Destroy(child.gameObject);
+        }
 
-        Cards = new GameObject[Decks.Length];
+        _cards = new List<GameObject>();
 
         bool onlyBought = toggle.isOn;
 
-        for (int i = 0; i < Decks.Length; i++) {
-            if (onlyBought) {
-                if (Decks[i].isBought) {
-                    Cards[i] = Instantiate(Decks[i].Cards[Random.Range(0, Decks[i].Cards.Length)], CardsHandler);
-                }
-            } else {
-                Cards[i] = Instantiate(Decks[i].Cards[Random.Range(0, Decks[i].Cards.Length)], CardsHandler);
-
-                if (!Decks[i].isBought) {
-                    GameObject d = Instantiate(Dollar, Cards[i].transform);
-                    d.GetComponent<DollarScr>().deck = Decks[i];
-                    d.GetComponent<DollarScr>().deckIndex = i;
-                    Cards[i].GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
-                }
+        foreach (var deckConfig in DecksTableConfig.Decks) {
+            DeckData data = SaveManager.SaveData.DeckDatas.First(d => d.DeckType == deckConfig.DeckType);
+            if (onlyBought && !data.isBought) {
+                continue;
             }
 
-            if (Cards[i]) {
-                Cards[i].GetComponent<CardScript>().enabled = false;
-                Cards[i].GetComponent<EventTrigger>().enabled = false;
-                if (Decks[i].isBought) {
-                    GameObject x = Instantiate(X, Cards[i].transform);
+            GameObject card = Instantiate(deckConfig.Cards[Random.Range(0, deckConfig.Cards.Length)], CardsHandler);
+            _cards.Add(card);
+
+            if (!data.isBought) {
+                DollarScr d = Instantiate(_dollarButtonPrefab, card.transform);
+                d.SetData(deckConfig);
+                card.GetComponent<Image>().color = new Color(255, 255, 255, 0.5f);
+            }
+
+            if (card) {
+                card.GetComponent<CardScript>().enabled = false;
+                card.GetComponent<EventTrigger>().enabled = false;
+                if (data.isBought) {
+                    GameObject x = Instantiate(X, card.transform);
                     Xscript xsc = x.GetComponent<Xscript>();
-                    xsc.deckIndex = i;
-                    xsc.CardImg = Cards[i].GetComponent<Image>();
-                    xsc.Change(Decks[i].IsEnb);
+                    xsc.DeckType = deckConfig.DeckType;
+                    xsc.CardImg = card.GetComponent<Image>();
+                    xsc.Change(data.isEnabled);
                 }
             }
         }
@@ -92,51 +97,57 @@ public class DecksManager : MonoBehaviour {
         decksOnAmount = 0;
         scoreCnt = 0;
         cashCnt = 0;
-        for (int i = 0; i < Decks.Length; i++) {
-            if (Decks[i].isBought && Decks[i].IsEnb) {
-                decksOnAmount++;
-                scoreCnt += Decks[i].scoreGet;
-                cashCnt += Decks[i].cashGet;
-            }
+        List<DeckType> enabledDecks = GetEnabledDecks();
+        foreach (DeckConfig deckConfig in DecksTableConfig.Decks.Where(deckConfig => enabledDecks.Contains(deckConfig.DeckType))) {
+            decksOnAmount++;
+            scoreCnt += deckConfig.scoreGet;
+            cashCnt += deckConfig.cashGet;
         }
 
         ScoreText.text = "x" + scoreCnt.ToString();
         CashText.text = "x" + cashCnt.ToString();
-        WalletText.text = bucksCnt.ToString();
+        WalletText.text = SaveManager.SaveData.bucks.ToString();
     }
 
     public void ReLoadDecks() {
-        sv = SaveManager.Load();
-
-        DeckData[] tmpDatas = new DeckData[Decks.Length];
-        for (int i = 0; i < tmpDatas.Length; i++) {
-            tmpDatas[i] = new DeckData(false, false);
-            if (i < sv.deckDatas.Length)
-                tmpDatas[i] = new DeckData(sv.deckDatas[i].isBought, sv.deckDatas[i].isEnabled);
-        }
-
-        sv.deckDatas = tmpDatas;
-
-        for (int i = 0; i < Decks.Length; i++) {
-            Decks[i].isBought = tmpDatas[i].isBought;
-            Decks[i].IsEnb = tmpDatas[i].isEnabled;
-        }
-
-        bucksCnt = sv.bucks;
         Recast();
     }
 
-    public void ReSaveDecks() {
-        for (int i = 0; i < sv.deckDatas.Length; i++) {
-            sv.deckDatas[i].isBought = Decks[i].isBought;
-            sv.deckDatas[i].isEnabled = Decks[i].IsEnb;
-        }
-
-        sv.bucks = bucksCnt;
-        SaveManager.Save(false, sv);
+    public void BuyDeck(DeckType deckType) {
+        DeckData d = SaveManager.SaveData.DeckDatas.First(d => d.DeckType == deckType);
+        d.isBought = true;
+        d.isEnabled = true;
+        SaveManager.Save();
     }
 
-    public void SwitchDeckSound() {
+    public bool TryToggleDeck(DeckType deckType) {
+        bool isEnabled = IsDeckEnabled(deckType);
+        if ((decksOnAmount <= 2 || isEnabled) && !isEnabled) {
+            return IsDeckEnabled(deckType);
+        }
+
+        DeckData data = SaveManager.SaveData.DeckDatas.First(d => d.DeckType == deckType);
+        data.isEnabled = !data.isEnabled;
+        SwitchDeckSound();
+        ReCount();
+        SaveManager.Save();
+        return IsDeckEnabled(deckType);
+    }
+
+    public bool IsDeckEnabled(DeckType deckType) {
+        DeckData data = SaveManager.SaveData.DeckDatas.First(d => d.DeckType == deckType);
+        return data.isEnabled;
+    }
+
+    public List<DeckType> GetEnabledDecks() {
+        return SaveManager.SaveData.DeckDatas.Where(d => d.isEnabled).Select(d => d.DeckType).ToList();
+    }
+
+    public List<DeckConfig> GetEnabledDecksConfigs() {
+        return DecksTableConfig.Decks.Where(deckConfig => SaveManager.SaveData.DeckDatas.Any(d => d.DeckType == deckConfig.DeckType && d.isEnabled)).ToList();
+    }
+
+    private void SwitchDeckSound() {
         SwitchSound.Play();
     }
 }

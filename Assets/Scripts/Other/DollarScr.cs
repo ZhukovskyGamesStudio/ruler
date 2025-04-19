@@ -1,18 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DollarScr : MonoBehaviour {
-    private MainMenuButtons MMB;
-    public DeckScript deck;
-    public int deckIndex;
+    private DeckConfig _config;
 
-    private void Start() {
-        MMB = GameObject.Find("Main Camera").GetComponent<MainMenuButtons>();
+    public void SetData(DeckConfig config) {
+        _config = config;
     }
 
     public void ToShop() {
-        MMB.To(8);
-        GameObject.Find("BuyDeckCanvas").GetComponent<ShopScript>().MakeVitrina(deck, deckIndex);
+        MainMenuButtons.Instance.To(8);
+        ShopScript.Instance.OpenBuyOffer(_config);
     }
 }

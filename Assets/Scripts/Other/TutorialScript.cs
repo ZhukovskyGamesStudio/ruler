@@ -1,14 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 public class TutorialScript : MonoBehaviour {
     public static int[] previousPams;
-    public DeckScript curDeck;
+
+    [field: SerializeField]
+    public DeckConfig TutorialDeck { get; private set; }
 
     public Transform[] HandPos;
-    public MainMenuButtons MMB;
 
     public GameObject StashButton;
     public GameObject ProgressHandler;
@@ -36,7 +34,7 @@ public class TutorialScript : MonoBehaviour {
 
         StashButton.SetActive(false);
         ProgressHandler.SetActive(false);
-        curDeck.GetRule(0);
+        TutorialDeck.GetRule(0);
         for (int i = 0; i < TutImages.Length; i++) {
             TutImages[i].SetActive(false);
         }
@@ -123,14 +121,14 @@ public class TutorialScript : MonoBehaviour {
         for (int i = 0; i < HandPos.Length; i++) {
             foreach (Transform child in HandPos[i].transform)
                 Destroy(child.gameObject);
-            MainCards[i] = Instantiate(curDeck.Cards[card], HandPos[i]);
+            MainCards[i] = Instantiate(TutorialDeck.Cards[card], HandPos[i]);
             MainCards[i].GetComponent<CardScript>().isTutorial = true;
         }
     }
 
     public void Skip() {
         PlayerPrefs.SetInt("tutorialComplete", 1);
-        MMB.To(0);
+        MainMenuButtons.Instance.To(0);
         GameObject.Find("AudioManager").GetComponent<AudioManager>().AmbientSwitch(-1);
     }
 
@@ -147,7 +145,7 @@ public class TutorialScript : MonoBehaviour {
         for (int i = 0; i < HandPos.Length; i++) {
             foreach (Transform child in HandPos[i].transform)
                 Destroy(child.gameObject);
-            MainCards[i] = Instantiate(curDeck.Cards[Random.Range(0, curDeck.Cards.Length)], HandPos[i]);
+            MainCards[i] = Instantiate(TutorialDeck.Cards[Random.Range(0, TutorialDeck.Cards.Length)], HandPos[i]);
             MainCards[i].GetComponent<CardScript>().isTutorial = true;
         }
     }

@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour {
+public class CoreManager : MonoBehaviour {
     public static int[] previousPams;
 
     public Transform EndGameCanvas;
@@ -22,8 +23,6 @@ public class GameManager : MonoBehaviour {
     public GameObject PauseButton;
     public GameObject[] progress;
 
-    public MainMenuButtons MMB;
-    public DecksManager DM;
     public DropField DF;
     private DeckScript[] Decks;
 
@@ -57,7 +56,7 @@ public class GameManager : MonoBehaviour {
     public int solvedDecksCnt;
 
     [HideInInspector]
-    public int bucksSaved;
+    public int bucksEarned;
 
     [HideInInspector]
     public int timeSpent;
@@ -82,7 +81,7 @@ public class GameManager : MonoBehaviour {
         zenBl = zen;
         StopAllCoroutines();
 
-        Decks = DM.Decks;
+        Decks = DecksManager.Instance.Decks;
         Reload();
         Restart(true);
 
@@ -106,9 +105,9 @@ public class GameManager : MonoBehaviour {
 
     public void СollectedBuck(int value) {
         BuckCollected.Play();
-       
-        bucksSaved += value;
-        
+
+        bucksEarned += value;
+
         StartCoroutine(QuoteShow(2));
     }
 
@@ -132,7 +131,6 @@ public class GameManager : MonoBehaviour {
     }
 
     public void FinishSequence() {
-
         int rulesDone;
         if (PlayerPrefs.HasKey("rulesDone"))
             rulesDone = PlayerPrefs.GetInt("rulesDone");
@@ -163,63 +161,56 @@ public class GameManager : MonoBehaviour {
     }
 
     public void EndGame() {
-        MMB.Canvases[1].gameObject.SetActive(false);
+        MainMenuButtons.Instance.Canvases[1].gameObject.SetActive(false);
 
         Record curRec = new Record(scoreCnt, timeSpent);
 
         AlreadyDoubledText.SetActive(false);
         DoubleButton.SetActive(true);
         scoreText.text = scoreCnt.ToString();
-        cashText.text = bucksSaved.ToString() + "®";
+        cashText.text = bucksEarned + "®";
 
-        MMB.SendRecord(scoreCnt);
-        Save sv = SaveManager.Load();
-        if (scoreCnt > sv.records[2].score) {
-            if (curRec.score > sv.records[1].score) {
-                if (curRec.score > sv.records[0].score) {
-                    sv.records[2] = sv.records[1];
-                    sv.records[1] = sv.records[0];
-                    sv.records[0] = curRec;
+        MainMenuButtons.Instance.SendRecord(scoreCnt);
+        if (scoreCnt > SaveManager.SaveData.records[2].score) {
+            if (curRec.score > SaveManager.SaveData.records[1].score) {
+                if (curRec.score > SaveManager.SaveData.records[0].score) {
+                    SaveManager.SaveData.records[2] = SaveManager.SaveData.records[1];
+                    SaveManager.SaveData.records[1] = SaveManager.SaveData.records[0];
+                    SaveManager.SaveData.records[0] = curRec;
                 } else {
-                    sv.records[2] = sv.records[1];
-                    sv.records[1] = curRec;
+                    SaveManager.SaveData.records[2] = SaveManager.SaveData.records[1];
+                    SaveManager.SaveData.records[1] = curRec;
                 }
             } else
-                sv.records[2] = curRec;
+                SaveManager.SaveData.records[2] = curRec;
         }
 
-        sv.bucks += bucksSaved;
+        SaveManager.SaveData.bucks += bucksEarned;
 
-        SaveManager.Save(false, sv);
-        MMB.UpdateRecords();
-        MMB.To(3);
+        SaveManager.Save();
+        MainMenuButtons.Instance.UpdateRecords();
+        MainMenuButtons.Instance.To(3);
     }
 
     public void DoubleBucks() {
-       // MMB.WatchDoubleAd();
+        // MMB.WatchDoubleAd();
     }
 
     public void OnUserDoubledReward(object sender, System.EventArgs args) {
         int bucks = PlayerPrefs.GetInt("bucks");
-        bucks += bucksSaved;
+        bucks += bucksEarned;
         PlayerPrefs.SetInt("bucks", bucks);
-        cashText.text = (bucksSaved * 2).ToString() + "®";
+        cashText.text = (bucksEarned * 2).ToString() + "®";
         AlreadyDoubledText.SetActive(true);
         DoubleButton.SetActive(false);
     }
 
     public void Restart(bool first) {
-        int j = 0;
-        DeckScript[] avDecks = new DeckScript[Decks.Length];
-        for (int i = 0; i < Decks.Length; i++) {
-            if (Decks[i].IsEnb && Decks[i].isBought) {
-                avDecks[j] = Decks[i];
-                j++;
-            }
-        }
+        List<DeckConfig> decks = DecksManager.Instance.GetEnabledDecksConfigs();
+        List<DeckScript> decksInGame = decks.Select(DeckRuleFactory.GetRuleByType).ToList();
 
         falseCnt = 0;
-        curDeck = avDecks[Random.Range(0, j)];
+        curDeck = decksInGame[Random.Range(0, decksInGame.Count)];
         curDeck.GetRule(Random.Range(50, 150));
 
         StopCoroutine(QuoteShow(first ? 0 : 1));
@@ -231,15 +222,11 @@ public class GameManager : MonoBehaviour {
     }
 
     public void Reload() {
-        Save sv = SaveManager.Load();
         buckChance = 0;
-        for (int i = 0; i < sv.deckDatas.Length; i++) {
-            Decks[i].isBought = sv.deckDatas[i].isBought;
-            Decks[i].IsEnb = sv.deckDatas[i].isEnabled;
-            if (Decks[i].IsEnb && Decks[i].isBought) {
-                buckChance += Decks[i].cashGet;
-                scoreMultiplayer += Decks[i].scoreGet;
-            }
+        List<DeckType> decks = DecksManager.Instance.GetEnabledDecks();
+        foreach (DeckConfig variable in DecksManager.Instance.DecksTableConfig.Decks.Where(variable => decks.Contains(variable.DeckType))) {
+            buckChance += variable.cashGet;
+            scoreMultiplayer += variable.scoreGet;
         }
     }
 
@@ -258,12 +245,12 @@ public class GameManager : MonoBehaviour {
                 Destroy(child.gameObject);
             }
 
-            MainCards[i] = Instantiate(curDeck.Cards[Random.Range(0, curDeck.Cards.Length)], HandPos[i]);
+            MainCards[i] = Instantiate(curDeck.Cards[Random.Range(0, curDeck.Cards.Count)], HandPos[i]);
             //if (!zenBl) {
-                if (Random.Range(0, 100) <= buckChance) {
-                    Instantiate(BuckPrefab, MainCards[i].transform);
-                    MainCards[i].GetComponent<CardScript>().withBuck = true;
-                }
+            if (Random.Range(0, 100) <= buckChance) {
+                Instantiate(BuckPrefab, MainCards[i].transform);
+                MainCards[i].GetComponent<CardScript>().withBuck = true;
+            }
             //}
         }
     }
@@ -370,7 +357,7 @@ public class GameManager : MonoBehaviour {
             case 2:
                 switch (Random.Range(0, 7)) {
                     case 0:
-                        quoteText.text = bucksSaved.ToString() + "® in my pockets, " + bucksSaved.ToString() + "®...";
+                        quoteText.text = bucksEarned.ToString() + "® in my pockets, " + bucksEarned.ToString() + "®...";
                         break;
                     case 1:
                         quoteText.text = "Cash cash ca-a-ash!!";
@@ -379,10 +366,10 @@ public class GameManager : MonoBehaviour {
                         quoteText.text = "Can I invest them? ";
                         break;
                     case 3:
-                        quoteText.text = bucksSaved.ToString() + "® — nothing is better than a fresh bill.";
+                        quoteText.text = bucksEarned.ToString() + "® — nothing is better than a fresh bill.";
                         break;
                     case 4:
-                        quoteText.text = bucksSaved.ToString() + "® — already ®illionare.";
+                        quoteText.text = bucksEarned.ToString() + "® — already ®illionare.";
                         break;
                     case 5:
                         quoteText.text = "® -> ®® -> ®®®®!";
