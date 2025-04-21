@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class AudioManager : MonoBehaviour {
     public AudioSource[] music;
@@ -8,6 +10,11 @@ public class AudioManager : MonoBehaviour {
     public AudioSource[] effects;
     float[] effectsMax;
     public Slider[] effectsSliders;
+    public static AudioManager Instance;
+
+    private void Awake() {
+        Instance = this;
+    }
 
     private void Start() {
         CreateVolumes();

@@ -29,7 +29,11 @@ public static class SaveManager {
             DeckDatas = new List<DeckData>()
         };
         foreach (DeckConfig deckConfig in decksTableConfig.Decks) {
-            sv.DeckDatas.Add(new DeckData(deckConfig.IsAlreadyAvailable, deckConfig.IsAlreadyAvailable));
+            sv.DeckDatas.Add(new DeckData() {
+                DeckType = deckConfig.DeckType,
+                isBought = deckConfig.IsAlreadyAvailable,
+                isEnabled = deckConfig.IsAlreadyAvailable
+            });
         }
         sv.records = new Record[3];
         for (int i = 0; i < sv.records.Length; i++) {
@@ -39,7 +43,7 @@ public static class SaveManager {
         return sv;
     }
 
-    public static Save Load(DecksTableConfig decksTableConfig) {
+    private static Save Load(DecksTableConfig decksTableConfig) {
         if (!PlayerPrefs.HasKey("save")) {
             return CreateNewSave(decksTableConfig);
         }
@@ -74,9 +78,4 @@ public class DeckData {
     public DeckType DeckType;
     public bool isBought;
     public bool isEnabled;
-
-    public DeckData(bool b, bool e) {
-        isBought = b;
-        isEnabled = e;
-    }
 }

@@ -35,8 +35,8 @@ public class TutorialScript : MonoBehaviour {
         StashButton.SetActive(false);
         ProgressHandler.SetActive(false);
         TutorialDeck.GetRule(0);
-        for (int i = 0; i < TutImages.Length; i++) {
-            TutImages[i].SetActive(false);
+        foreach (GameObject t in TutImages) {
+            t.SetActive(false);
         }
 
         CorrectCounter(false);

@@ -24,7 +24,6 @@ public class CoreManager : MonoBehaviour {
     public GameObject[] progress;
 
     public DropField DF;
-    private DeckScript[] Decks;
 
     public AudioSource BuckCollected;
     public AudioSource DeckDone;
@@ -80,8 +79,6 @@ public class CoreManager : MonoBehaviour {
     public void CreateLevel(bool zen) {
         zenBl = zen;
         StopAllCoroutines();
-
-        Decks = DecksManager.Instance.Decks;
         Reload();
         Restart(true);
 
@@ -161,7 +158,7 @@ public class CoreManager : MonoBehaviour {
     }
 
     public void EndGame() {
-        MainMenuButtons.Instance.Canvases[1].gameObject.SetActive(false);
+        MainMenuButtons.Instance.DisablePanel(1);
 
         Record curRec = new Record(scoreCnt, timeSpent);
 
@@ -188,7 +185,6 @@ public class CoreManager : MonoBehaviour {
         SaveManager.SaveData.bucks += bucksEarned;
 
         SaveManager.Save();
-        MainMenuButtons.Instance.UpdateRecords();
         MainMenuButtons.Instance.To(3);
     }
 

@@ -11,10 +11,6 @@ using UnityEngine.UI;
 /// ca-app-pub-5529160665131462/5078026508
 /// </summary>
 public class MainMenuButtons : MonoBehaviour {
-    public Transform[] Canvases;
-
-    public Text[] Records;
-    public Text[] RecordsTime;
     public Text quoteText;
     public Text quoterText;
 
@@ -26,6 +22,9 @@ public class MainMenuButtons : MonoBehaviour {
 
     [SerializeField]
     private CoreManager _coreManager;
+
+    [SerializeField]
+    private PanelsManager _panelsManager;
 
     private const string leaderBoard = "CgkIzqeEhsMMEAIQAw";
 
@@ -40,9 +39,6 @@ public class MainMenuButtons : MonoBehaviour {
 
     private const string pMoney1 = "app_money_1";
 
-    Transform mainCam;
-    int curCanvas;
-
     bool isActive;
 
     public static MainMenuButtons Instance;
@@ -52,53 +48,51 @@ public class MainMenuButtons : MonoBehaviour {
         Instance = this;
     }
 
-    private void DisableCanvases() {
-        foreach (Transform t in Canvases) {
-            t.gameObject.SetActive(false);
-        }
+    public void DisablePanel(int index) {
+        _panelsManager.DisablePanel(index);
     }
 
     void Update() {
 #if UNITY_ANDROID
-        if (60 != Application.targetFrameRate)
+        if (Application.targetFrameRate != 60)
             Application.targetFrameRate = 60;
-
 #endif
     }
 
     public void Start() {
-        DisableCanvases();
 #if UNITY_ANDROID
         QualitySettings.vSyncCount = 0;
 #endif
-        GetComponent<Camera>().orthographicSize = 400f * ((float)Screen.height / Screen.width) / (800f / 480f);
-        mainCam = GetComponent<Transform>();
-        curCanvas = 0;
+        //GetComponent<Camera>().orthographicSize = 400f * ((float)Screen.height / Screen.width) / (800f / 480f);
 
         ActivateGooglePlay();
         //MobileAds.Initialize(initStatus => { });
         //LoadAd();
         //LoadAd1();
 
-        if (!PlayerPrefs.HasKey("tutorialComplete")) {
-            To(9);
-            _audioManager.AmbientSwitch(-2);
-        } else
-            To(0);
+        GoToFirstPanel();
 
         QuoteShow();
+    }
+
+    private void GoToFirstPanel() {
+        _panelsManager.DisablePanels();
+        if (!PlayerPrefs.HasKey("tutorialComplete")) {
+            _panelsManager.TeleportTo(9);
+            AudioManager.Instance.AmbientSwitch(-2);
+        } else {
+            _panelsManager.TeleportTo(0);
+        }
     }
 
     /**********/
 
     public void To(int canvasIndex) {
-        Canvases[canvasIndex].gameObject.SetActive(true);
-        StartCoroutine(CamMovement(
-            new Vector3(Canvases[canvasIndex].position.x, Canvases[canvasIndex].position.y, mainCam.transform.position.z), canvasIndex));
+        _panelsManager.To(canvasIndex);
     }
 
     public void ToGame(bool zen) {
-        To(1);
+        _panelsManager.To(1);
         StartCoroutine(GameLateCreate(zen));
     }
 
@@ -142,25 +136,6 @@ public class MainMenuButtons : MonoBehaviour {
                 break;
         }
     }
-
-    public void UpdateRecords() {
-        for (int i = 0; i < Records.Length; i++) {
-            Records[i].text = "Record";
-            RecordsTime[i].text = "";
-        }
-
-        Record[] records = SaveManager.SaveData.records;
-        for (int i = 0; i < records.Length; i++) {
-            if (records[i].score <= 0) {
-                continue;
-            }
-
-            Records[i].text = records[i].score.ToString();
-            int t = records[i].time;
-            RecordsTime[i].text = (t / 60 < 10 ? "0" : "") + t / 60 + " : " + (t % 60 < 10 ? "0" : "") + t % 60;
-        }
-    }
-
     /**********/
     /* private void LoadAd() {
          ad = new RewardedAd(bucks10_ad);
@@ -247,34 +222,6 @@ public class MainMenuButtons : MonoBehaviour {
     }*/
 
     /**********/
-
-    public IEnumerator CamMovement(Vector3 finPos, int nextIndex) {
-        if (nextIndex == 4)
-            UpdateRecords();
-        if (nextIndex == 7) {
-            DecksManager.Instance.ReLoadDecks();
-        }
-
-        if (nextIndex == 9)
-            Canvases[9].GetComponent<TutorialScript>().ReCast();
-
-        Canvases[nextIndex].gameObject.SetActive(true);
-        Vector3 startPos = mainCam.position;
-        float MoveTime = 0.3f;
-        float time = 0;
-        while (time < MoveTime) {
-            mainCam.position = Vector3.Lerp(startPos, finPos, time / MoveTime);
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-
-        if (curCanvas != nextIndex && nextIndex != 2)
-            Canvases[curCanvas].gameObject.SetActive(false);
-        curCanvas = nextIndex;
-        mainCam.position = finPos;
-
-        yield return false;
-    }
 
     public IEnumerator GameLateCreate(bool zen) {
         yield return new WaitForSeconds(0.15f);
