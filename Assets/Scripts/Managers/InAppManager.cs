@@ -1,4 +1,9 @@
-﻿using System;
+﻿using UnityEngine;
+
+public class InAppManager : MonoBehaviour { }
+
+/*
+using System;
 using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.Purchasing.Extension;
@@ -111,4 +116,4 @@ namespace IAP {
                 failureReason));
         }
     }
-}
+}*/
